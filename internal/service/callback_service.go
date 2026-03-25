@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"regexp"
 	"strings"
@@ -414,10 +415,10 @@ func (s *CallbackService) handleFailed(ctx context.Context, videoID string, jobE
 }
 
 func (s *CallbackService) classifyRepoError(err error) error {
-	if err == repository.ErrDocumentNotFound {
+	if errors.Is(err, repository.ErrDocumentNotFound) {
 		return &PermanentError{Err: err}
 	}
-	if err == repository.ErrInvalidTransition {
+	if errors.Is(err, repository.ErrInvalidTransition) {
 		return &PermanentError{Err: err}
 	}
 

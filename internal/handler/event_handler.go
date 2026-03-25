@@ -148,10 +148,10 @@ func (h *EventHandler) respondWithError(ctx context.Context, err error, meta *mo
 	span := trace.SpanFromContext(ctx)
 	log := config.LoggerWithTrace(ctx, h.logger, h.projectID)
 
-	switch e := err.(type) {
-	case *service.PermanentError:
+	switch {
+	case service.IsPermanent(err):
 		span.SetStatus(codes.Error, "permanent error")
-		span.RecordError(e, trace.WithAttributes(
+		span.RecordError(err, trace.WithAttributes(
 			attribute.String("error.type", "permanent"),
 		))
 		span.AddEvent("message.ack.permanent_error")
@@ -164,13 +164,13 @@ func (h *EventHandler) respondWithError(ctx context.Context, err error, meta *mo
 			zap.String("outcome", "ack"),
 			zap.String("messageId", messageId),
 			zap.String("eventId", meta.ID),
-			zap.Error(e))
+			zap.Error(err))
 
 		return platform.ResultAck
 
-	case *service.TransientError:
+	case service.IsTransient(err):
 		span.SetStatus(codes.Error, "transient error")
-		span.RecordError(e, trace.WithAttributes(
+		span.RecordError(err, trace.WithAttributes(
 			attribute.String("error.type", "transient"),
 		))
 		span.AddEvent("message.nack.transient_error")
@@ -182,13 +182,13 @@ func (h *EventHandler) respondWithError(ctx context.Context, err error, meta *mo
 			zap.String("outcome", "nack"),
 			zap.String("messageId", messageId),
 			zap.String("eventId", meta.ID),
-			zap.Error(e))
+			zap.Error(err))
 
 		return platform.ResultNack
 
 	default:
 		span.SetStatus(codes.Error, "unknown error")
-		span.RecordError(e, trace.WithAttributes(
+		span.RecordError(err, trace.WithAttributes(
 			attribute.String("error.type", "unknown"),
 		))
 		span.AddEvent("message.nack.unknown_error")
@@ -200,7 +200,7 @@ func (h *EventHandler) respondWithError(ctx context.Context, err error, meta *mo
 			zap.String("outcome", "nack"),
 			zap.String("messageId", messageId),
 			zap.String("eventId", meta.ID),
-			zap.Error(e))
+			zap.Error(err))
 
 		return platform.ResultNack
 	}
