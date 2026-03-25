@@ -30,12 +30,14 @@ func (e *TransientError) Unwrap() error {
 	return e.Err
 }
 
-func isPermanent(err error) bool {
+// IsPermanent reports whether err (or any error in its chain) is a PermanentError.
+func IsPermanent(err error) bool {
 	var perr *PermanentError
-	return err != nil && (errors.As(err, &perr) || isPermanent(errors.Unwrap(err)))
+	return errors.As(err, &perr)
 }
 
-func isTransient(err error) bool {
+// IsTransient reports whether err (or any error in its chain) is a TransientError.
+func IsTransient(err error) bool {
 	var terr *TransientError
-	return err != nil && (errors.As(err, &terr) || isTransient(errors.Unwrap(err)))
+	return errors.As(err, &terr)
 }
