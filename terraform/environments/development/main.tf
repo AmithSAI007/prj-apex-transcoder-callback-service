@@ -15,7 +15,7 @@ module "service" {
   memory_limit                = var.memory_limit
   cpu_limit                   = var.cpu_limit
   gcs_bucket                  = module.storage.processed_videos_bucket_name
-  pubsub_subscription_id      = module.pubsub.apex_transcoder_subscription_id
+  pubsub_subscription_id      = module.pubsub.apex_transcoder_subscription_name
   min_instance_count          = var.min_instance_count
   max_instance_count          = var.max_instance_count
   app_env                     = var.app_env
