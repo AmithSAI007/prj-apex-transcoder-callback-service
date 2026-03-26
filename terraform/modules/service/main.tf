@@ -1,4 +1,4 @@
-resource "google_cloud_run_v2_service" "apex_ingestion_service" {
+resource "google_cloud_run_v2_service" "apex_transcoder_callback_service" {
   name     = var.service_name
   location = var.project_region
 
